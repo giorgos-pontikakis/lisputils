@@ -15,5 +15,7 @@
    :string-upcase-gr
    :parse-float
    :parse-rational
-   :iso-time))
+   :iso-time
+   :zip
+   :plist-union))
 

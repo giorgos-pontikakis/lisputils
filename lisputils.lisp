@@ -94,3 +94,34 @@
             year month date hour minute second)))
 
 
+;;; ----------------------------------------------------------------------
+;;; Lists
+;;; ----------------------------------------------------------------------
+(defun zip (list1 list2 &key (key1 #'identity) (key2 #'identity))
+  "Combine two lists in one, picking items in alternating order."
+  (iter (for item1 in list1)
+        (for item2 in list2)
+        (collect (funcall key1 item1))
+        (collect (funcall key2 item2))))
+
+(defun plist-union (plist1 plist2 &key (test #'null))
+  "Copy plist1 in a new plist, but for the values satisfying the test
+function, search the corresponding key in plist2. If found there, use
+val2, not val1. Finally copy to plist1 the keys/values of plist2 that
+are not found in plist1"
+  (let ((part1 (iter (for key1 in plist1 by #'cddr)
+                     (for val1 in (rest plist1) by #'cddr)
+                     (collect key1)
+                     (collect (if (funcall test val1)
+                                  (let* ((default (gensym)) ;; this default value cannot be matched 
+                                         (val2 (getf plist2 key1 default))) 
+                                    (if (eql val2 default) val1 val2)) 
+                                  val1))))
+        (part2 (iter (for key2 in plist2 by #'cddr)
+                     (for val2 in (rest plist2) by #'cddr)
+                     (let* ((default (gensym))
+                            (val1 (getf plist1 key2 default))) 
+                       (when (eql val1 default)
+                         (collect key2)
+                         (collect val2))))))
+    (append part1 part2)))
