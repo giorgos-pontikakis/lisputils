@@ -105,11 +105,13 @@
         (collect (funcall key2 item2))))
 
 (defun parallel (list1 list2 item1 &key (test #'eql))
-  "Find the item in list2 that has the same position as item1 in list1."
-  (assert (length= list1 list2))
-  (let ((pos (position item1 list1 :test test)))
-    (when pos
-      (nth pos list2))))
+  "Find the item in list2 that has the same position as item1 in list1." 
+  (if (null list2)
+      nil
+      (let ((pos (position item1 list1 :test test)))
+        (if pos
+            (nth pos list2)
+            nil))))
 
 (defun plist-union (plist1 plist2 &key (test #'null))
   "Copy plist1 in a new plist, but for the values satisfying the test
