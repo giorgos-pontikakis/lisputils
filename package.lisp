@@ -17,5 +17,6 @@
    :parse-rational
    :iso-time
    :zip
-   :plist-union))
+   :plist-union
+   :parallel))
 

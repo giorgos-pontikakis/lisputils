@@ -95,7 +95,7 @@
 
 
 ;;; ----------------------------------------------------------------------
-;;; Lists
+;;; Lists & Property lists
 ;;; ----------------------------------------------------------------------
 (defun zip (list1 list2 &key (key1 #'identity) (key2 #'identity))
   "Combine two lists in one, picking items in alternating order."
@@ -103,6 +103,13 @@
         (for item2 in list2)
         (collect (funcall key1 item1))
         (collect (funcall key2 item2))))
+
+(defun parallel (list1 list2 item1 &key (test #'eql))
+  "Find the item in list2 that has the same position as item1 in list1."
+  (assert (length= list1 list2))
+  (let ((pos (position item1 list1 :test test)))
+    (when pos
+      (nth pos list2))))
 
 (defun plist-union (plist1 plist2 &key (test #'null))
   "Copy plist1 in a new plist, but for the values satisfying the test
