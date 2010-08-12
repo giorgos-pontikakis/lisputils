@@ -95,7 +95,7 @@
 
 
 ;;; ----------------------------------------------------------------------
-;;; Lists & Property lists
+;;; Lists
 ;;; ----------------------------------------------------------------------
 (defun zip (list1 list2 &key (key1 #'identity) (key2 #'identity))
   "Combine two lists in one, picking items in alternating order."
@@ -113,7 +113,10 @@
             (nth pos list2)
             nil))))
 
-(defun plist-union (plist1 plist2 &key (test #'null))
+;;; ----------------------------------------------------------------------
+;;; Property lists
+;;; ----------------------------------------------------------------------
+(defun unionf (plist1 plist2 &key (test #'null))
   "Copy plist1 in a new plist, but for the values satisfying the test
 function, search the corresponding key in plist2. If found there, use
 val2, not val1. Finally copy to plist1 the keys/values of plist2 that
@@ -134,3 +137,38 @@ are not found in plist1"
                          (collect key2)
                          (collect val2))))))
     (append part1 part2)))
+
+
+
+(defun collectf (bag plist &key on-values-p (test #'eql))
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (nconcing
+         (if (member (if on-values-p val key) bag :test test)
+             (list key val)
+             nil))))
+
+(defun collectf-if (pred plist &key on-values-p)
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (nconcing
+         (if (funcall pred (if on-values-p val key))
+             (list key val)
+             nil))))
+
+(defun keysf (plist)
+  "Get the keys of the plist."
+  (iter (for key in plist by #'cddr)
+        (collect key)))
+
+(defun valuesf (plist)
+  "Get the values of the plist."
+  (iter (for key in (rest plist) by #'cddr)
+        (collect key)))
+
+(defun mapf (fn plist)
+  "Map the plist to one, with values coming from applying fn applied
+to every original plist value."
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (nconcing (list key (funcall fn val)))))

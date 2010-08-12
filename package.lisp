@@ -17,6 +17,11 @@
    :parse-rational
    :iso-time
    :zip
-   :plist-union
-   :parallel))
+   :parallel
+   :unionf
+   :collectf
+   :collectf-if
+   :keysf
+   :valuesf
+   :mapf))
 
