@@ -23,5 +23,7 @@
    :collectf-if
    :keysf
    :valuesf
-   :mapf))
+   :mapf
+   :mapvalf
+   :dof))
 

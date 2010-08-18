@@ -166,9 +166,25 @@ are not found in plist1"
   (iter (for key in (rest plist) by #'cddr)
         (collect key)))
 
-(defun mapf (fn plist)
-  "Map the plist to one, with values coming from applying fn applied
-to every original plist value."
+(defun mapvalf (fn plist)
+  "Map the plist to a new one, with values coming from applying fn
+applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn val)))))
+
+(defun mapf (fn plist)
+  "Map the plist to a new one, with values coming from applying fn
+applied to every original plist key and value."
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (nconcing (list key (funcall fn key val)))))
+
+(defun dof (fn plist)
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (funcall fn key val)))
+
+
+
+
