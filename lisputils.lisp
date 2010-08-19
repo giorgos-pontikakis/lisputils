@@ -116,11 +116,11 @@
 ;;; ----------------------------------------------------------------------
 ;;; Property lists
 ;;; ----------------------------------------------------------------------
-(defun unionf (plist1 plist2 &key (test #'null))
-  "Copy plist1 in a new plist, but for the values satisfying the test
-function, search the corresponding key in plist2. If found there, use
-val2, not val1. Finally copy to plist1 the keys/values of plist2 that
-are not found in plist1"
+(defun plist-union (plist1 plist2 &key (test #'null))
+  "Take the union of the two property lists. For the keys that are
+found in both plists, apply test function to the value of the first
+plist. If true, discard it and use the value from the second plist
+instead."
   (let ((part1 (iter (for key1 in plist1 by #'cddr)
                      (for val1 in (rest plist1) by #'cddr)
                      (collect key1)
@@ -140,7 +140,7 @@ are not found in plist1"
 
 
 
-(defun collectf (bag plist &key on-values-p (test #'eql))
+(defun plist-collect (bag plist &key on-values-p (test #'eql))
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing
@@ -148,7 +148,7 @@ are not found in plist1"
              (list key val)
              nil))))
 
-(defun collectf-if (pred plist &key on-values-p)
+(defun plist-collect-if (pred plist &key on-values-p)
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing
@@ -156,31 +156,31 @@ are not found in plist1"
              (list key val)
              nil))))
 
-(defun keysf (plist)
+(defun plist-keys (plist)
   "Get the keys of the plist."
   (iter (for key in plist by #'cddr)
         (collect key)))
 
-(defun valuesf (plist)
+(defun plist-vals (plist)
   "Get the values of the plist."
   (iter (for key in (rest plist) by #'cddr)
         (collect key)))
 
-(defun mapvalf (fn plist)
+(defun plist-map-vals (fn plist)
   "Map the plist to a new one, with values coming from applying fn
 applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn val)))))
 
-(defun mapf (fn plist)
+(defun plist-map (fn plist)
   "Map the plist to a new one, with values coming from applying fn
 applied to every original plist key and value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn key val)))))
 
-(defun dof (fn plist)
+(defun plist-do (fn plist)
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (funcall fn key val)))

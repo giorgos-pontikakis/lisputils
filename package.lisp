@@ -18,12 +18,12 @@
    :iso-time
    :zip
    :parallel
-   :unionf
-   :collectf
-   :collectf-if
-   :keysf
-   :valuesf
-   :mapf
-   :mapvalf
-   :dof))
+   :plist-union
+   :plist-collect
+   :plist-collect-if
+   :plist-keys
+   :plist-vals
+   :plist-map
+   :plist-map-vals
+   :plist-do))
 
