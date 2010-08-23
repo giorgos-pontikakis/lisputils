@@ -70,17 +70,21 @@
     `(let ((,scanner (load-time-value (cl-ppcre:create-scanner ,regex ,@args))))
        ,@body)))
 
-(defun parse-float (str)
+(defun parse-float (str &optional no-error-on-failure)
   (with-regex-scanner (s "^ *[+-]?[0-9]+(\\.[0-9]*)?([eEdDsSlL][+-]?[0-9]+)? *$")
     (if (cl-ppcre:scan s str)
 	(read-from-string str)
-	nil)))
+        (if no-error-on-failure
+            nil
+            (error 'parse-error)))))
 
-(defun parse-rational (str)
+(defun parse-rational (str &optional no-error-on-failure)
   (with-regex-scanner (s "^ *[+-]?(([0-9]+)|([0-9]+/[0-9]+))+ *$")
     (if (cl-ppcre:scan s str)
 	(read-from-string str)
-	nil)))
+	(if no-error-on-failure
+            nil
+            (error 'parse-error)))))
 
 
 ;;; ----------------------------------------------------------------------
