@@ -178,8 +178,8 @@ applied to every original plist value."
         (nconcing (list key (funcall fn val)))))
 
 (defun plist-map (fn plist)
-  "Map the plist to a new one, with values coming from applying fn
-applied to every original plist key and value."
+  "Map the plist to a new one, with values coming from applying fn to
+ every original plist key and value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn key val)))))
