@@ -1,21 +1,21 @@
 (in-package :lisputils)
 
-
 ;; ----------------------------------------------------------------------
-;; Packages   
+;; Packages
 ;; ----------------------------------------------------------------------
 (defmacro with-package-check (package &body body)
   (with-gensyms (pkg)
     `(let ((,pkg (find-package ,package)))
-       (if ,pkg 
-	   (progn
-	     ,@body)
-	   (error "Package ~A does not exist." ,package)))))
+       (if ,pkg
+           (progn
+             ,@body)
+           (error "Package ~A does not exist." ,package)))))
 
 (defun package-key (package)
   (if (keywordp package)
       package
       (make-keyword (package-name package))))
+
 
 
 ;; ----------------------------------------------------------------------
@@ -24,14 +24,15 @@
 (defun make-pathname* (&key file (dir *default-pathname-defaults*))
   (if file
       (iter (for i in (ensure-list dir))
-	    (reducing (pathname-as-directory i)
-		      by #'(lambda (parent child)
-			     (merge-pathnames child parent))
-		      initial-value (pathname-as-file file)))
+            (reducing (pathname-as-directory i)
+                      by #'(lambda (parent child)
+                             (merge-pathnames child parent))
+                      initial-value (pathname-as-file file)))
       (iter (for i in (ensure-list dir))
-	    (reducing (pathname-as-directory i)
-		      by #'(lambda (parent child)
-			     (merge-pathnames child parent))))))
+            (reducing (pathname-as-directory i)
+                      by #'(lambda (parent child)
+                             (merge-pathnames child parent))))))
+
 
 
 ;; ----------------------------------------------------------------------
@@ -40,26 +41,40 @@
 (defun make-symbol* (string &optional (package *package*))
   (intern (string-upcase string) package))
 
+
+
 ;; ----------------------------------------------------------------------
 ;; Strings
 ;; ----------------------------------------------------------------------
+
 (defun string-upcase-gr (string)
+  "Upcase a string and converted accented characters to
+non-accented. Also take care of final sigma."
   (let ((result-string (string-upcase string)))
     (mapc #'(lambda (pair)
-	      (nsubstitute (cdr pair)
-			   (car pair)
-			   result-string))
-	  '((#\Ά . #\A)
-	    (#\Έ . #\Ε)
-	    (#\Ή . #\Η)
-	    (#\Ί . #\Ι)
-	    (#\ΐ . #\Ϊ)
-	    (#\Ό . #\Ο)
-	    (#\ς . #\Σ)
-	    (#\Ύ . #\Υ)
-	    (#\Ώ . #\Ω)
-	    (#\ΰ . #\Ϋ)))
+              (nsubstitute (cdr pair)
+                           (car pair)
+                           result-string))
+          '((#\Ά . #\A)
+            (#\Έ . #\Ε)
+            (#\Ή . #\Η)
+            (#\Ί . #\Ι)
+            (#\ΐ . #\Ϊ)
+            (#\Ό . #\Ο)
+            (#\ς . #\Σ)
+            (#\Ύ . #\Υ)
+            (#\Ώ . #\Ω)
+            (#\ΰ . #\Ϋ)))
     result-string))
+
+(defun white-trim (str)
+  "String-trims whitespace characters"
+  (string-trim '(#\newline #\space #\tab #\return #\linefeed #\page) str))
+
+(defun white-char-p (c)
+  "Predicate for whitespace characters"
+  (find c '(#\newline #\space #\tab #\return #\linefeed #\page)))
+
 
 
 ;;; -------------------------------------------------------------
@@ -73,7 +88,7 @@
 (defun parse-float (str &optional no-error-on-failure)
   (with-regex-scanner (s "^ *[+-]?[0-9]+(\\.[0-9]*)?([eEdDsSlL][+-]?[0-9]+)? *$")
     (if (cl-ppcre:scan s str)
-	(read-from-string str)
+        (read-from-string str)
         (if no-error-on-failure
             nil
             (error 'parse-error)))))
@@ -81,10 +96,11 @@
 (defun parse-rational (str &optional no-error-on-failure)
   (with-regex-scanner (s "^ *[+-]?(([0-9]+)|([0-9]+/[0-9]+))+ *$")
     (if (cl-ppcre:scan s str)
-	(read-from-string str)
-	(if no-error-on-failure
+        (read-from-string str)
+        (if no-error-on-failure
             nil
             (error 'parse-error)))))
+
 
 
 ;;; ----------------------------------------------------------------------
@@ -98,6 +114,7 @@
             year month date hour minute second)))
 
 
+
 ;;; ----------------------------------------------------------------------
 ;;; Lists
 ;;; ----------------------------------------------------------------------
@@ -109,7 +126,7 @@
         (collect (funcall key2 item2))))
 
 (defun parallel (list1 list2 item1 &key (test #'eql))
-  "Find the item in list2 that has the same position as item1 in list1." 
+  "Find the item in list2 that has the same position as item1 in list1."
   (if (null list2)
       nil
       (let ((pos (position item1 list1 :test test)))
@@ -117,9 +134,26 @@
             (nth pos list2)
             nil))))
 
+(defun find-duplicates (list &key (test #'eql) (key #'identity))
+  "Returns a list of duplicate elements of a list"
+  (with-db ()
+    (let ((uniques nil)
+          (duplicates nil))
+      (iter (for item in list)
+            (if (member (funcall key item) uniques :test test :key key)
+                (push item duplicates)
+                (push item uniques)))
+      duplicates)))
+
+
+
 ;;; ----------------------------------------------------------------------
 ;;; Property lists
 ;;; ----------------------------------------------------------------------
+
+(defun make-plist (keys data)
+  (mapcan #'list keys data))
+
 (defun plist-union (plist1 plist2 &key (test #'null))
   "Take the union of the two property lists. For the keys that are
 found in both plists, apply test function to the value of the first
@@ -129,20 +163,18 @@ instead."
                      (for val1 in (rest plist1) by #'cddr)
                      (collect key1)
                      (collect (if (funcall test val1)
-                                  (let* ((default (gensym)) ;; this default value cannot be matched 
-                                         (val2 (getf plist2 key1 default))) 
-                                    (if (eql val2 default) val1 val2)) 
+                                  (let* ((default (gensym)) ;; this default value cannot be matched
+                                         (val2 (getf plist2 key1 default)))
+                                    (if (eql val2 default) val1 val2))
                                   val1))))
         (part2 (iter (for key2 in plist2 by #'cddr)
                      (for val2 in (rest plist2) by #'cddr)
                      (let* ((default (gensym))
-                            (val1 (getf plist1 key2 default))) 
+                            (val1 (getf plist1 key2 default)))
                        (when (eql val1 default)
                          (collect key2)
                          (collect val2))))))
     (append part1 part2)))
-
-
 
 (defun plist-collect (bag plist &key on-values-p (test #'eql))
   (iter (for key in plist by #'cddr)
@@ -188,7 +220,3 @@ applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (funcall fn key val)))
-
-
-
-
