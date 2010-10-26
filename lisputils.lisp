@@ -136,14 +136,13 @@ non-accented. Also take care of final sigma."
 
 (defun find-duplicates (list &key (test #'eql) (key #'identity))
   "Returns a list of duplicate elements of a list"
-  (with-db ()
-    (let ((uniques nil)
-          (duplicates nil))
-      (iter (for item in list)
-            (if (member (funcall key item) uniques :test test :key key)
-                (push item duplicates)
-                (push item uniques)))
-      duplicates)))
+  (let ((uniques nil)
+        (duplicates nil))
+    (iter (for item in list)
+          (if (member (funcall key item) uniques :test test :key key)
+              (push item duplicates)
+              (push item uniques)))
+    duplicates))
 
 
 
