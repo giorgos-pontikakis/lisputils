@@ -21,17 +21,9 @@
 ;; ----------------------------------------------------------------------
 ;; Pathnames
 ;; ----------------------------------------------------------------------
-(defun make-pathname* (&key file (dir *default-pathname-defaults*))
-  (if file
-      (iter (for i in (ensure-list dir))
-            (reducing (pathname-as-directory i)
-                      by #'(lambda (parent child)
-                             (merge-pathnames child parent))
-                      initial-value (pathname-as-file file)))
-      (iter (for i in (ensure-list dir))
-            (reducing (pathname-as-directory i)
-                      by #'(lambda (parent child)
-                             (merge-pathnames child parent))))))
+(defun parent-directory (pathname)
+  (merge-pathnames (make-pathname :directory '(:relative :up) :defaults pathname)
+                   pathname))
 
 
 
