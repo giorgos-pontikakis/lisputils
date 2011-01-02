@@ -47,7 +47,7 @@ non-accented. Also take care of final sigma."
               (nsubstitute (cdr pair)
                            (car pair)
                            result-string))
-          '((#\Ά . #\A)
+          '((#\Ά . #\Α)
             (#\Έ . #\Ε)
             (#\Ή . #\Η)
             (#\Ί . #\Ι)
