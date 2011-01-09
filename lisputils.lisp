@@ -146,10 +146,10 @@ non-accented. Also take care of final sigma."
   (mapcan #'list keys data))
 
 (defun plist-union (plist1 plist2 &key (test #'null))
-  "Take the union of the two property lists. For the keys that are
-found in both plists, apply test function to the value of the first
-plist. If true, discard it and use the value from the second plist
-instead."
+  "Take the union of the two property lists. To choose between values
+of keys which are common to both plists, apply the test function to the
+value of the first plist. If true, discard it and use the value from
+the second plist instead."
   (let ((part1 (iter (for key1 in plist1 by #'cddr)
                      (for val1 in (rest plist1) by #'cddr)
                      (collect key1)
