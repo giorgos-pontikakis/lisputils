@@ -28,5 +28,4 @@
    :plist-keys
    :plist-vals
    :plist-map
-   :plist-map-vals
-   :plist-do))
+   :plist-map-vals))

@@ -206,8 +206,3 @@ applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn key val)))))
-
-(defun plist-do (fn plist)
-  (iter (for key in plist by #'cddr)
-        (for val in (rest plist) by #'cddr)
-        (funcall fn key val)))
