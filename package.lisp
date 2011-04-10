@@ -10,18 +10,24 @@
   (:export
    :with-package-check
    :package-key
-   :make-pathname*
+   :parent-directory
    :make-symbol*
+   ;; strings
    :string-upcase-gr
    :white-trim
    :white-char-p
+   ;; number parsing
    :parse-float
    :parse-rational
+   ;; time
    :iso-time
+   ;; lists
    :zip
    :parallel
    :find-duplicates
    :make-plist
+   :ninsert-list
+   ;; property lists
    :plist-union
    :plist-collect
    :plist-collect-if
