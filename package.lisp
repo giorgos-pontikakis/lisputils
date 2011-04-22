@@ -34,4 +34,5 @@
    :plist-keys
    :plist-vals
    :plist-map
+   :plist-mapc
    :plist-map-vals))

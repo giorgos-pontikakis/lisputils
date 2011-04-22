@@ -78,9 +78,9 @@ non-accented. Also take care of final sigma."
        ,@body)))
 
 (defun parse-float (str &optional no-error-on-failure)
-  (with-regex-scanner (s "^ *[+-]?[0-9]+(\\.[0-9]*)?([eEdDsSlL][+-]?[0-9]+)? *$")
+  (with-regex-scanner (s "^ *[+-]?[0-9]+((\\.|\\,)[0-9]*)?([eEdDsSlL][+-]?[0-9]+)? *$")
     (if (cl-ppcre:scan s str)
-        (read-from-string str)
+        (read-from-string (substitute #\. #\, str))
         (if no-error-on-failure
             nil
             (error 'parse-error)))))
@@ -216,3 +216,10 @@ applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (nconcing (list key (funcall fn key val)))))
+
+(defun plist-mapc (fn plist)
+  "Map the plist to a new one, with values coming from applying fn to
+ every original plist key and value."
+  (iter (for key in plist by #'cddr)
+        (for val in (rest plist) by #'cddr)
+        (funcall fn key val)))
