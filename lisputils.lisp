@@ -146,6 +146,10 @@ non-accented. Also take care of final sigma."
         (push thing (cdr tail))
         list)))
 
+(defun insert-list (n thing list)
+  (append (subseq list 0 n)
+          (cons thing (nthcdr n list))))
+
 
 
 ;;; ----------------------------------------------------------------------

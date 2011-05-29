@@ -27,6 +27,7 @@
    :find-duplicates
    :make-plist
    :ninsert-list
+   :insert-list
    ;; property lists
    :plist-union
    :plist-collect
