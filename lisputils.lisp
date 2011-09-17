@@ -77,19 +77,19 @@ non-accented. Also take care of final sigma."
     `(let ((,scanner (load-time-value (cl-ppcre:create-scanner ,regex ,@args))))
        ,@body)))
 
-(defun parse-float (str &optional no-error-on-failure)
+(defun parse-float (str &key junk-allowed)
   (with-regex-scanner (s "^ *[+-]?[0-9]+((\\.|\\,)[0-9]*)?([eEdDsSlL][+-]?[0-9]+)? *$")
     (if (cl-ppcre:scan s str)
         (read-from-string (substitute #\. #\, str))
-        (if no-error-on-failure
+        (if junk-allowed
             nil
             (error 'parse-error)))))
 
-(defun parse-rational (str &optional no-error-on-failure)
+(defun parse-rational (str &optional junk-allowed)
   (with-regex-scanner (s "^ *[+-]?(([0-9]+)|([0-9]+/[0-9]+))+ *$")
     (if (cl-ppcre:scan s str)
         (read-from-string str)
-        (if no-error-on-failure
+        (if junk-allowed
             nil
             (error 'parse-error)))))
 
