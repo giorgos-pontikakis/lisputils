@@ -96,18 +96,6 @@ non-accented. Also take care of final sigma."
 
 
 ;;; ----------------------------------------------------------------------
-;;; Time
-;;; ----------------------------------------------------------------------
-(defun iso-time (&optional (time (get-universal-time)))
-  "Returns the universal time TIME as a string in full ISO format."
-  (multiple-value-bind (second minute hour date month year)
-      (decode-universal-time time)
-    (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d"
-            year month date hour minute second)))
-
-
-
-;;; ----------------------------------------------------------------------
 ;;; Lists
 ;;; ----------------------------------------------------------------------
 (defun zip (list1 list2 &key (key1 #'identity) (key2 #'identity))

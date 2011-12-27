@@ -19,8 +19,6 @@
    ;; number parsing
    :parse-float
    :parse-rational
-   ;; time
-   :iso-time
    ;; lists
    :zip
    :parallel
