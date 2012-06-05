@@ -34,4 +34,7 @@
    :plist-vals
    :plist-map
    :plist-mapc
-   :plist-map-vals))
+   :plist-map-vals
+   ;; with-hashe-identity
+   :*with-hashed-identity-body-forms*
+   :with-hashed-identity))

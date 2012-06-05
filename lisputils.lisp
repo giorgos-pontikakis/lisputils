@@ -215,3 +215,89 @@ applied to every original plist value."
   (iter (for key in plist by #'cddr)
         (for val in (rest plist) by #'cddr)
         (funcall fn key val)))
+
+
+;;;
+;;; WITH-HASHED-IDENTITY
+;;; by Erik Naggum, comp.lang.lisp, 9/4/2004
+
+;;; Corrected a small error: in the original there was an missing closing
+;;; parenthesis after the error form, and an extra closing parenthesis at
+;;; the end of the macro.
+
+#|Nothing beats reading the specification to find out how such things work.
+A copy of the standard or something very much like it almost certainly
+comes with your Common Lisp implementation or it provides pointers to
+resources on the Net.  I would suggest you look for the documentation
+available with your Common Lisp system.
+
+However, I trust that you will look for the documentatio, so this sketchy
+answer will be valuable in context of what you find in the documentation.
+You are quite right that case, ccase and ecase all use eql for the test
+and you cannot change this.  This is because the cases are specified as
+literals in the source of your program, quite unlike the elements of a
+sequence searched by member and the like at run-time.  It is expected
+that the compiler make good use of the fact that these are literals.  You
+find the same "restriction" in all other language that have a case-like
+branching form.  However, it would be in the Common Lisp spirit to make a
+more general form available without cost to the programmer, although it
+would be a little more expensive to implement.  The key to implement a
+more general form is that we should keep the very valuable optimization
+quality of testing for identity.  There are several ways to accomplish
+this, but I prefer the following:|#
+
+(defun extract-case-keys (case-form)
+  (loop for clause in (cddr case-form)
+        until (and (eq (car case-form) 'case) (member (car clause) '(t otherwise)))
+        if (listp (car clause))
+          append (car clause)
+        else
+          collect (car clause)))
+
+(defparameter *with-hashed-identity-body-forms*
+  '((case . extract-case-keys)
+    (ccase . extract-case-keys)
+    (ecase . extract-case-keys))
+  "Alist of the valid operators in body forms of a with-hashed-identity form
+with their key-extraction function.")
+
+(defun with-hashed-identity-error (body)
+  (error "Body form of with-hashed-identity is ~A, but must be one of:~{ ~A~}."
+         (caar body) (mapcar #'car *with-hashed-identity-body-forms*)))
+
+(defun with-hashed-identity-hashtable (hash-table body)
+  (dolist (key (funcall (or (cdr (assoc (car body) *with-hashed-identity-body-forms*))
+                            'with-hashed-identity-error)
+                        body))
+    (setf (gethash key hash-table) key))
+  hash-table)
+
+(defmacro with-hashed-identity (hash-options &body body)
+  "A wrapper around case forms to enable case tests via a hashtable."
+  (unless (and (listp (car body))
+               (null (cdr body)))                  ;TODO: Allow multiple body forms.
+    (error "Body of with-hashed-identity must be a single form."))
+  (let ((hash-table (make-symbol "hashtable")))
+    `(let ((,hash-table (load-time-value
+                         (with-hashed-identity-hashtable (make-hash-table ,@hash-options)
+                           ',(car body)))))
+       (,(caar body) (gethash ,(cadar body) ,hash-table) ,@(cddar body)))))
+
+#|  This allows the following forms to succeed:
+
+    (with-hashed-identity (:test #'equal)
+      (case "foo"
+        ("foo" 'yeah)
+        (t 'bummer)))
+
+    (with-hashed-identity (:test #'equalp)
+      (case "foo"
+        ("FOO" 'yeah)
+        (t 'bummer)))
+
+    (with-hashed-identity (:test #'equalp)
+      (case (vector #\f #\o #\o)
+        (#(#\F #\O #\O) 'yeah)
+        (t 'bummer)))
+
+|#
