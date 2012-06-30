@@ -115,14 +115,15 @@ non-accented. Also take care of final sigma."
             nil))))
 
 (defun find-duplicates (list &key (test #'eql) (key #'identity))
-  "Returns a list of duplicate elements of a list"
+  "Returns two values: the primary value is a list of duplicate elements of a list. The
+secondary is the list of the unique elements of the list."
   (let ((uniques nil)
         (duplicates nil))
     (iter (for item in list)
           (if (member (funcall key item) uniques :test test :key key)
               (push item duplicates)
               (push item uniques)))
-    duplicates))
+    (values duplicates uniques)))
 
 (defun ninsert-list (n thing list)
   ;; by Kent Pitman (named insert-before-element-n-destructively, comp-lang-lisp: 28 Oct 1992)
