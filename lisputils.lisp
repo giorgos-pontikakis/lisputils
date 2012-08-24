@@ -136,8 +136,13 @@ secondary is the list of the unique elements of the list."
         list)))
 
 (defun insert-list (n thing list)
-  (append (subseq list 0 n)
-          (cons thing (nthcdr n list))))
+  (if (= n 0)
+      (cons thing list)
+      (let ((tail (nthcdr (1- n) list)))
+        (if (null tail)
+            (error "There is no position ~D in ~S." n list)
+            (append (subseq list 0 n)
+                    (cons thing (cdr tail)))))))
 
 
 
