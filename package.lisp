@@ -2,9 +2,9 @@
 
 (defpackage :lisputils
   (:use :common-lisp
-        :cl-fad
+   :cl-fad
         :cl-ppcre
-        :iterate
+   :iterate
         :alexandria)
   (:shadow alexandria::copy-stream alexandria::copy-file)
   (:export

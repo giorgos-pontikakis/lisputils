@@ -256,9 +256,9 @@ this, but I prefer the following:|#
   (loop for clause in (cddr case-form)
         until (and (eq (car case-form) 'case) (member (car clause) '(t otherwise)))
         if (listp (car clause))
-          append (car clause)
+        append (car clause)
         else
-          collect (car clause)))
+        collect (car clause)))
 
 (defparameter *with-hashed-identity-body-forms*
   '((case . extract-case-keys)
@@ -289,21 +289,19 @@ with their key-extraction function.")
                            ',(car body)))))
        (,(caar body) (gethash ,(cadar body) ,hash-table) ,@(cddar body)))))
 
-#|  This allows the following forms to succeed:
+;; This allows the following forms to succeed:
 
-    (with-hashed-identity (:test #'equal)
-      (case "foo"
-        ("foo" 'yeah)
-        (t 'bummer)))
+;; (with-hashed-identity (:test #'equal)
+;;   (case "foo"
+;;     ("foo" 'yeah)
+;;     (t 'bummer)))
 
-    (with-hashed-identity (:test #'equalp)
-      (case "foo"
-        ("FOO" 'yeah)
-        (t 'bummer)))
+;; (with-hashed-identity (:test #'equalp)
+;;   (case "foo"
+;;     ("FOO" 'yeah)
+;;     (t 'bummer)))
 
-    (with-hashed-identity (:test #'equalp)
-      (case (vector #\f #\o #\o)
-        (#(#\F #\O #\O) 'yeah)
-        (t 'bummer)))
-
-|#
+;; (with-hashed-identity (:test #'equalp)
+;;   (case (vector #\f #\o #\o)
+;;     (#(#\F #\O #\O) 'yeah)
+;;     (t 'bummer)))
