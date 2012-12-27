@@ -100,10 +100,10 @@ non-accented. Also take care of final sigma."
 ;;; ----------------------------------------------------------------------
 (defun zip (list1 list2 &key (key1 #'identity) (key2 #'identity))
   "Combine two lists in one, picking items in alternating order."
-  (iter (for item1 in list1)
-        (for item2 in list2)
-        (collect (funcall key1 item1))
-        (collect (funcall key2 item2))))
+  (loop for item1 in list1
+        for item2 in list2
+        collect (funcall key1 item1)
+        collect (funcall key2 item2)))
 
 (defun parallel (list1 list2 item1 &key (test #'eql))
   "Find the item in list2 that has the same position as item1 in list1."
@@ -116,14 +116,13 @@ non-accented. Also take care of final sigma."
 
 (defun find-duplicates (list &key (test #'eql) (key #'identity))
   "Returns two values: the primary value is a list of duplicate elements of a list. The
-secondary is the list of the unique elements of the list."
-  (let ((uniques nil)
-        (duplicates nil))
-    (iter (for item in list)
-          (if (member (funcall key item) uniques :test test :key key)
-              (push item duplicates)
-              (push item uniques)))
-    (values duplicates uniques)))
+secondary is the original list with the duplicates removed."
+  (loop for item in list
+        if (member (funcall key item) uniques :test test :key key)
+        collect item into duplicates
+        else
+        collect item into uniques
+        finally (return (values duplicates uniques))))
 
 (defun ninsert-list (n thing list)
   ;; by Kent Pitman (named insert-before-element-n-destructively, comp-lang-lisp: 28 Oct 1992)
@@ -158,21 +157,23 @@ secondary is the list of the unique elements of the list."
 of keys which are common to both plists, apply the test function to the
 value of the first plist. If true, discard it and use the value from
 the second plist instead."
-  (let ((part1 (iter (for key1 in plist1 by #'cddr)
-                     (for val1 in (rest plist1) by #'cddr)
-                     (collect key1)
-                     (collect (if (funcall test val1)
-                                  (let* ((default (gensym)) ;; this default value cannot be matched
-                                         (val2 (getf plist2 key1 default)))
-                                    (if (eql val2 default) val1 val2))
-                                  val1))))
-        (part2 (iter (for key2 in plist2 by #'cddr)
-                     (for val2 in (rest plist2) by #'cddr)
-                     (let* ((default (gensym))
-                            (val1 (getf plist1 key2 default)))
-                       (when (eql val1 default)
-                         (collect key2)
-                         (collect val2))))))
+  (let ((part1 (loop for default = (gensym) ;; this default value cannot be in the plist already
+                     for key1 in plist1 by #'cddr
+                     for val1 in (rest plist1) by #'cddr
+                     for val2 = (getf plist2 key1 default)
+                     collect key1
+                     if (and (funcall test val1) (not (eql val2 default)))
+                     collect val2
+                     else
+                     collect val1))
+        (part2 (loop for default = (gensym)
+                     for key2 in plist2 by #'cddr
+                     for val2 in (rest plist2) by #'cddr
+                     for val1 = (getf plist1 key2 default)
+                     when (eql val1 default)
+                     collect key2
+                     and
+                     collect val2)))
     (append part1 part2)))
 
 (defun plist-collect (bag plist &key on-values-p (test #'eql))
