@@ -1,11 +1,7 @@
 (in-package :cl-user)
 
 (defpackage :lisputils
-  (:use :common-lisp
-   :cl-fad
-        :cl-ppcre
-   :iterate
-        :alexandria)
+  (:use :common-lisp :cl-fad :cl-ppcre :alexandria)
   (:shadow alexandria::copy-stream alexandria::copy-file)
   (:export
    :with-package-check
