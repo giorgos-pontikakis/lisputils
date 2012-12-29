@@ -119,9 +119,9 @@ non-accented. Also take care of final sigma."
 secondary is the original list with the duplicates removed."
   (loop for item in list
         if (member (funcall key item) uniques :test test :key key)
-        collect item into duplicates
+          collect item into duplicates
         else
-        collect item into uniques
+          collect item into uniques
         finally (return (values duplicates uniques))))
 
 (defun ninsert-list (n thing list)
@@ -163,30 +163,29 @@ the second plist instead."
                      for val2 = (getf plist2 key1 default)
                      collect key1
                      if (and (funcall test val1) (not (eql val2 default)))
-                     collect val2
+                       collect val2
                      else
-                     collect val1))
+                       collect val1))
         (part2 (loop for default = (gensym)
                      for key2 in plist2 by #'cddr
                      for val2 in (rest plist2) by #'cddr
                      for val1 = (getf plist1 key2 default)
                      when (eql val1 default)
-                     collect key2
-                     and
-                     collect val2)))
+                       collect key2
+                       and collect val2)))
     (append part1 part2)))
 
 (defun plist-collect (bag plist &key on-values-p (test #'eql))
   (loop for key in plist by #'cddr
         for val in (rest plist) by #'cddr
         when (member (if on-values-p val key) bag :test test)
-        nconc (list key val)))
+          nconc (list key val)))
 
 (defun plist-collect-if (pred plist &key on-values-p)
   (loop for key in plist by #'cddr
         for val in (rest plist) by #'cddr
         when (funcall pred (if on-values-p val key))
-        nconc (list key val)))
+          nconc (list key val)))
 
 (defun plist-keys (plist)
   "Get the keys of the plist."
@@ -253,9 +252,9 @@ this, but I prefer the following:|#
   (loop for clause in (cddr case-form)
         until (and (eq (car case-form) 'case) (member (car clause) '(t otherwise)))
         if (listp (car clause))
-        append (car clause)
+          append (car clause)
         else
-        collect (car clause)))
+          collect (car clause)))
 
 (defparameter *with-hashed-identity-body-forms*
   '((case . extract-case-keys)
