@@ -72,6 +72,7 @@ non-accented. Also take care of final sigma."
 ;;; -------------------------------------------------------------
 ;;; Number parsing
 ;;; -------------------------------------------------------------
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defmacro with-regex-scanner ((scanner regex &rest args) &body body)
     `(let ((,scanner (load-time-value (cl-ppcre:create-scanner ,regex ,@args))))
@@ -301,3 +302,36 @@ with their key-extraction function.")
 ;;   (case (vector #\f #\o #\o)
 ;;     (#(#\F #\O #\O) 'yeah)
 ;;     (t 'bummer)))
+
+
+;;; -------------------------------------------------------------
+;;; TREES
+;;; -------------------------------------------------------------
+
+(defun dft (expander-fn root)
+  "Depth first traverse"
+  (labels ((dft-aux (expanded fringe)
+             (if (null fringe)
+                 expanded
+                 (let ((head (first fringe))
+                       (tail (rest fringe)))
+                   (dft-aux (list* head expanded)
+                            (append (funcall expander-fn head)
+                                    tail))))))
+    (dft-aux nil (list root))))
+
+(defun dfs (target expander-fn root &key (test #'eql))
+  "Depth first search"
+  (labels ((dfs-aux (fringe)
+             (if (null fringe)
+                 ;; fringe exhausted, target not found
+                 nil
+                 ;; grap the head of the fringe and test it
+                 (let ((head (first fringe)))
+                   (if (funcall test head target)
+                       ;; target found, return it
+                       head
+                       ;; expand fringe and continue (depth-first search)
+                       (dfs-aux (append (funcall expander-fn head)
+                                        (rest fringe))))))))
+    (dfs-aux (list root))))
