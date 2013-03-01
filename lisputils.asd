@@ -6,16 +6,17 @@
 (in-package :lisputils-asdf)
 
 (defsystem :lisputils
+  :version "1.0.0"
+  :serial t
   :depends-on (:cl-fad
                :cl-ppcre
                :alexandria)
-  :serial t
   :components ((:file "package")
                (:file "lisputils")))
 
 (defsystem :lisputils-tests
-  :depends-on (:lisputils :hu.dwim.stefil)
   :serial t
+  :depends-on (:lisputils :hu.dwim.stefil)
   :components ((:module "tests"
                 :serial t
                 :components ((:file "package")
