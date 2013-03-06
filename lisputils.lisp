@@ -1,8 +1,11 @@
 (in-package :lisputils)
 
+
+
 ;; ----------------------------------------------------------------------
 ;; Packages
 ;; ----------------------------------------------------------------------
+
 (defmacro with-package-check (package &body body)
   (with-gensyms (pkg)
     `(let ((,pkg (find-package ,package)))

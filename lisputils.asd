@@ -1,7 +1,7 @@
 (in-package :cl)
 
 (defpackage :lisputils-asdf
-    (:use :cl :asdf))
+  (:use :cl :asdf))
 
 (in-package :lisputils-asdf)
 
