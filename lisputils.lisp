@@ -209,11 +209,11 @@ applied to every original plist value."
         nconc (list key (funcall fn val))))
 
 (defun plist-map (fn plist)
-  "Map the plist to a new one, with values coming from applying fn to
- every original plist key and value."
+  "For every key-value pair of the plist, call the function fn with
+the key and value as input arguments, collecting the results"
   (loop for key in plist by #'cddr
         for val in (rest plist) by #'cddr
-        nconcing (list key (funcall fn key val))))
+        collecting (funcall fn key val)))
 
 (defun plist-mapc (fn plist)
   "For every key-value pair of the plist, call the function fn with
