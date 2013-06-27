@@ -6,7 +6,7 @@
 (in-package :lisputils-asdf)
 
 (defsystem :lisputils
-  :version "1.0.0"
+  :version "1.1.0"
   :serial t
   :depends-on (:cl-fad
                :cl-ppcre
